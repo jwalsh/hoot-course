@@ -1,6 +1,9 @@
-.PHONY: all setup run test lint clean
+HOOT = hoot
+GUILE = guile
 
-all: setup
+.PHONY: all hello-world todo-app clean setup run test lint clean
+
+all: setup hello-world todo-app
 
 setup:
 	@echo "Setting up the project..."
@@ -21,13 +24,8 @@ lint:
 clean:
 	@echo "Cleaning up..."
 	@rm -rf build
+	@rm -rf web/*.wasm
 
-HOOT = hoot
-GUILE = guile
-
-.PHONY: all hello-world todo-app clean
-
-all: hello-world todo-app
 
 hello-world: src/hello-world.scm
 	$(HOOT) compile -o build/hello-world.wasm src/hello-world.scm
@@ -39,6 +37,3 @@ todo-app: src/todo-app.scm
 
 run-hello-world: hello-world
 	$(GUILE) -e "(load-extension \"build/hello-world.wasm\")"
-
-clean:
-	rm -f build/*.wasm web/*.wasm
