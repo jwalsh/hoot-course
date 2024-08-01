@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guile Hoot Todo App</title>
+    <style>
+        /* Add your CSS styles here */
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <script src="path/to/hoot-runtime.js"></script>
+    <script>
+     window.addEventListener("load", function() {
+         Scheme.load_main("todo-app.wasm", {}, {
+             document: {
+                 body: () => document.body,
+                 getElementById: id => document.getElementById(id),
+                 createElement: tag => document.createElement(tag),
+                 createTextNode: text => document.createTextNode(text)
+             },
+             element: {
+                 appendChild: (parent, child) => parent.appendChild(child),
+                 setAttribute: (elem, name, value) => elem.setAttribute(name, value),
+                 addEventListener: (elem, event, handler) => elem.addEventListener(event, handler),
+                 removeEventListener: (elem, event, handler) => elem.removeEventListener(event, handler),
+                 remove: elem => elem.remove(),
+                 replaceWith: (oldElem, newElem) => oldElem.replaceWith(newElem),
+                 removeAttribute: (elem, name) => elem.removeAttribute(name),
+                 value: elem => elem.value,
+                 setValue: (elem, value) => { elem.value = value; },
+                 checked: elem => elem.checked,
+                 setChecked: (elem, checked) => { elem.checked = checked; }
+             },
+             event: {
+                 target: event => event.target,
+                 preventDefault: event => event.preventDefault()
+             }
+         });
+     });
+    </script>
+</body>
+</html>

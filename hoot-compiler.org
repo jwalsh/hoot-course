@@ -1,0 +1,167 @@
+#+TITLE: Hoot Compiler Review
+#+AUTHOR: Jason Walsh
+#+DATE: 2024-08-01
+
+* Introduction
+
+This document reviews the Hoot compiler, a Scheme to WebAssembly compiler. We'll walk through key components of the code, explaining their purpose and providing examples where appropriate.
+
+* Module Definition and Imports
+
+#+BEGIN_SRC scheme
+(define-module (hoot compile)
+  #:use-module (ice-9 binary-ports)
+  #:use-module (ice-9 match)
+  #:use-module ((system base compile)
+                #:select ((compile . %compile)
+                          default-warning-level
+                          default-optimization-level))
+  #:use-module (system base target)
+  #:use-module (hoot library-group)
+  #:use-module (hoot inline-wasm)
+  #:use-module (hoot backend)
+  #:use-module (hoot frontend)
+  #:use-module (hoot config)
+  #:use-module (wasm assemble)
+  #:export (%default-program-imports
+            scheme->sealed-tree-il
+            read-and-compile
+            compile-file
+            compile
+            library-load-path-extension))
+#+END_SRC
+
+This section defines the module and imports necessary dependencies. It also specifies which functions are exported from this module.
+
+* Helper Macros and Functions
+
+** with-hoot-target
+
+#+BEGIN_SRC scheme
+(define-syntax-rule (with-hoot-target . body)
+  (with-target "wasm32-unknown-hoot"
+    (lambda ()
+      (parameterize ((target-runtime 'hoot))
+        . body))))
+#+END_SRC
+
+This macro sets up the compilation target for Hoot, ensuring that the compiler uses the correct WebAssembly target and runtime.
+
+Example usage:
+#+BEGIN_SRC scheme
+(with-hoot-target
+  (compile '(display "Hello, WebAssembly!")))
+#+END_SRC
+
+** %include-from-path
+
+This function handles file inclusion, searching for files in the Hoot load path.
+
+* Compilation Process
+
+** scheme->sealed-tree-il
+
+#+BEGIN_SRC scheme
+(define* (scheme->sealed-tree-il expr #:key
+                                 (imports %default-program-imports)
+                                 (import-abi? #f)
+                                 (include-file %include-from-path)
+                                 (extend-load-library (lambda (f) f))
+                                 (load-library
+                                  (extend-load-library
+                                   (builtin-module-loader import-abi?))))
+  ;; ... implementation ...
+  )
+#+END_SRC
+
+This function converts Scheme expressions to Tree-IL (Intermediate Language). It's a crucial step in the compilation process.
+
+Example usage:
+#+BEGIN_SRC scheme
+(define tree-il
+  (scheme->sealed-tree-il
+   '(define (factorial n)
+      (if (zero? n)
+          1
+          (* n (factorial (- n 1)))))))
+#+END_SRC
+
+** compile
+
+#+BEGIN_SRC scheme
+(define* (compile expr #:key
+                  (imports %default-program-imports)
+                  (import-abi? #f)
+                  (export-abi? #t)
+                  (include-file %include-from-path)
+                  (extend-load-library
+                   (library-load-path-extension (hoot-load-path)))
+                  (load-library
+                   (extend-load-library (builtin-module-loader import-abi?)))
+                  (optimization-level (default-optimization-level))
+                  (warning-level (default-warning-level))
+                  (dump-tree-il? #f)
+                  (dump-cps? #f)
+                  (dump-wasm? #f)
+                  (emit-names? #f)
+                  (opts '()))
+  ;; ... implementation ...
+  )
+#+END_SRC
+
+This is the main compilation function. It takes Scheme expressions and compiles them to WebAssembly.
+
+Example usage:
+#+BEGIN_SRC scheme
+(define wasm-module
+  (compile
+   '(define (greet name)
+      (display (string-append "Hello, " name "!")))))
+#+END_SRC
+
+** read-and-compile
+
+This function reads Scheme code from a port and compiles it to WebAssembly.
+
+Example usage:
+#+BEGIN_SRC scheme
+(call-with-input-string
+ "(display \"Hello, WebAssembly!\")"
+ (lambda (port)
+   (read-and-compile port)))
+#+END_SRC
+
+** compile-file
+
+#+BEGIN_SRC scheme
+(define* (compile-file input-file #:key
+                       (output-file #f)
+                       (import-abi? #f)
+                       (export-abi? #t)
+                       (optimization-level (default-optimization-level))
+                       (warning-level (default-warning-level))
+                       (include-file (include-relative-to-file input-file))
+                       (extend-load-library (lambda (f) f))
+                       (load-library
+                        (extend-load-library (builtin-module-loader import-abi?)))
+                       (dump-tree-il? #f)
+                       (dump-cps? #f)
+                       (dump-wasm? #f)
+                       (emit-names? #f)
+                       (opts '()))
+  ;; ... implementation ...
+  )
+#+END_SRC
+
+This function compiles a Scheme file to WebAssembly and optionally writes the output to a file.
+
+Example usage:
+#+BEGIN_SRC scheme
+(compile-file "my-scheme-program.scm"
+              #:output-file "my-program.wasm"
+              #:optimization-level 2)
+#+END_SRC
+
+* Conclusion
+
+The Hoot compiler provides a powerful tool for compiling Scheme to WebAssembly. It offers various options for optimization, debugging, and customization of the compilation process. By understanding its components and usage, developers can effectively leverage Scheme for WebAssembly development.
