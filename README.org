@@ -1,21 +1,66 @@
-#+TITLE: Hoot: Compiling Scheme to WebAssembly Course
+#+TITLE: Guile Hoot Examples
 
-* Overview
-  This project contains materials for the "Hoot: Compiling Scheme to WebAssembly" course.
+This repository contains examples of using Guile Hoot for WebAssembly development.
 
-* Directory Structure
-  - src/ :: Source code for the course projects
-  - tests/ :: Test files
-  - scripts/ :: Utility scripts
-  - docs/ :: Documentation
-  - examples/ :: Example Scheme programs
+* Prerequisites
 
-* Getting Started
-  1. Ensure you have Guile and Hoot installed
-  2. Run =make setup= to set up the project
-  3. Use =make run= to compile and run example programs
-  4. Use =make test= to run the test suite
-  5. Use =make lint= to run linters on the code
+- Guile Scheme
+- Guile Hoot
+- Make
 
-* Contact
-  For questions or support, please contact Jason Walsh <j@wal.sh> ([[https://wal.sh]])
+* Setup and Installation
+
+To set up the project and install dependencies:
+
+#+BEGIN_SRC sh
+./scripts/setup.sh # or make
+#+END_SRC
+
+This script will check your system, install Hoot if necessary (on macOS), and set up the project structure.
+
+* Building
+
+To build all examples:
+
+#+BEGIN_SRC sh
+make all
+#+END_SRC
+
+To build specific examples:
+
+#+BEGIN_SRC sh
+make hello-world
+make todo-app
+#+END_SRC
+
+* Running
+
+To run the Hello World example:
+
+#+BEGIN_SRC sh
+make run-hello-world
+#+END_SRC
+
+The Todo app requires a web server setup to run. After building, you can serve the ~web~ directory with any static file server.
+
+* Cleaning
+
+To clean built files:
+
+#+BEGIN_SRC sh
+make clean
+#+END_SRC
+
+* Project Structure
+
+- ~src/~: Contains source Scheme files
+- ~build/~: Contains compiled WebAssembly modules
+- ~web/~: Contains files for web deployment
+
+* Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+* License
+
+This project is licensed under MIT.
