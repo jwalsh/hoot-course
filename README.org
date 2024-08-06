@@ -1,3 +1,6 @@
+#+TITLE: hoot-course
+#+LAST_MODIFIED: 2024-08-06 06:46:45
+
 #+TITLE: Guile Hoot Examples
 
 This repository contains examples of using Guile Hoot for WebAssembly development.
